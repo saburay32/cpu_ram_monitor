@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import sys
+from process import CpuBar
 
 
 
@@ -15,7 +16,9 @@ class Application(tk.Tk):
         self.resizable(False,False)
         self.title('CPU-RAM monitor bar')
 
+        self.cpu = CpuBar()
         self.set_ui()
+        self.make_bar_cpu_usage()
 
     def set_ui(self):
         exit_but = ttk.Button(self, text='Exit', command = self.app_exit)
@@ -31,11 +34,24 @@ class Application(tk.Tk):
         ttk.Button(self.bar2, text='move').pack(side=tk.LEFT)
         ttk.Button(self.bar2, text='>>>').pack(side=tk.LEFT)
 
-        self.bar2 = ttk.LabelFrame(self, text='Power')
-        self.bar2.pack(fill=tk.BOTH)
+        self.bar = ttk.LabelFrame(self, text='Power')
+        self.bar.pack(fill=tk.BOTH)
 
         self.bind_class('Tk', '<Enter>', self.enter_mouse)
         self.bind_class('Tk', '<Leave>', self.leave_mouse)
+
+    def make_bar_cpu_usage(self):
+        ttk.Label(self.bar, text =f'physical cores: {self.cpu.cpu_count}, logical cores:{self.cpu.cpu_count_logical}', anchor=tk.CENTER).pack(fill=tk.X)
+
+        self.list_label = []
+        self.list_pbar = []
+
+        for i in range(self.cpu.cpu_count_logical):
+            self.list_label.append(ttk.Label(self.bar, anchor=tk.CENTER))
+            self.list_pbar.append(ttk.Progressbar(self.bar, length=100))
+        for i in range(self.cpu.cpu_count_logical):
+            self.list_label[i].pack(fill=tk.X)
+            self.list_pbar[i].pack(fill=tk.X)
 
     def enter_mouse(self, event):
         if self.combo_win.current() == 0 or 1:
@@ -49,5 +65,7 @@ class Application(tk.Tk):
         self.destroy()
         sys.exit()
 
-root = Application()
-root.mainloop()
+
+if __name__ == '__main__':
+    root = Application()
+    root.mainloop()
